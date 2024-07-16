@@ -2,9 +2,7 @@ const gameboard = document.getElementById("gameboard");
 const cpucheck = document.getElementById("cpucheck");
 const ctx = gameboard.getContext("2d");
 const STATE = {STARTUP: 0, PLAYING: 1};
-
 let state = STATE.STARTUP;
-
 let boardWidth = 500;
 let boardHeight = 500;
 let paddleWidth = 25;
