@@ -1,5 +1,5 @@
 class Ball {
-    constructor(x, y, vx, vy, r, c){
+    constructor(x, y, vx, vy, r, c) {
         this.x = x;
         this.y = y;
         this.vx = vx;
@@ -9,73 +9,94 @@ class Ball {
         this.inPlay = false;
     }
 
-    draw(ctx){
+    draw(ctx) {
         ctx.fillStyle = this.c;
         ctx.strokeStyle = "black";
         ctx.lineWidth = 2;
 
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.r, 0, 2*Math.PI);
+        ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
         ctx.stroke();
         ctx.fill();
     }
 
     move() {
-        this.x += this.vx
-        this.y += this.vy
+        this.x += this.vx;
+        this.y += this.vy;
     }
 
     bounce(things) {
-        this.bounceWalls()
-        for (let thing of things){
+        this.bounceWalls();
+        for (let thing of things) {
             if (thing instanceof Paddle) {
-                if (thing.side == SIDE.LEFT){ 
-                    let side = this.bounceLeftPaddle(thing)
+                if (thing.side == SIDE.LEFT) {
+                    let side = this.bounceLeftPaddle(thing);
                     if (side != SIDE.NONE) return side;
                 }
-                if (thing.side == SIDE.RIGHT){
-                    let side = this.bounceRightPaddle(thing)
+                if (thing.side == SIDE.RIGHT) {
+                    let side = this.bounceRightPaddle(thing);
                     if (side != SIDE.NONE) return side;
                 }
             }
-        }     
-        return SIDE.NONE;   
+            if (thing instanceof Obstacle) {
+                this.bounceObstacle(thing);
+            }
+        }
+        return SIDE.NONE;
     }
 
-
-    bounceWalls(){
+    bounceWalls() {
         if (this.y - this.r < 0) {
-            this.vy = Math.abs(this.vy)
+            this.vy = Math.abs(this.vy);
         }
-        if (this.y + this.r > boardHeight){
-            this.vy = -Math.abs(this.vy)
+        if (this.y + this.r > boardHeight) {
+            this.vy = -Math.abs(this.vy);
         }
     }
+
     bounceLeftPaddle(paddle) {
         if (this.x - this.r > paddle.w) return SIDE.NONE;
         if (this.x - this.r < 0) return SIDE.RIGHT;
-        if (this.y < paddle.y) return SIDE.NONE
+        if (this.y < paddle.y) return SIDE.NONE;
         if (this.y > paddle.y + paddle.l) return SIDE.NONE;
         if (this.vx < 0) {
             this.vx = paddleForce * Math.abs(this.vx);
-
+            let paddlePos = (this.y - paddle.y - paddle.l / 2) / paddle.l * 2;
+            this.vy += paddlePos * 1.5;
         }
         return SIDE.NONE;
     }
 
-    
     bounceRightPaddle(paddle) {
         if (this.x + this.r < paddle.x) return SIDE.NONE;
         if (this.x + this.r > paddle.x + paddle.w) return SIDE.LEFT;
-        if (this.y < paddle.y) return SIDE.NONE
+        if (this.y < paddle.y) return SIDE.NONE;
         if (this.y > paddle.y + paddle.l) return SIDE.NONE;
         if (this.vx > 0) {
             this.vx = -paddleForce * Math.abs(this.vx);
-
+            let paddlePos = (this.y - paddle.y - paddle.l / 2) / paddle.l * 2;
+            this.vy += paddlePos * 1.5;
         }
         return SIDE.NONE;
     }
 
-    
+    bounceObstacle(obstacle) {
+        if (
+            this.x + this.r > obstacle.x &&
+            this.x - this.r < obstacle.x + obstacle.w &&
+            this.y + this.r > obstacle.y &&
+            this.y - this.r < obstacle.y + obstacle.l
+        ) {
+            // Determine if the ball hits the obstacle from the sides or the top/bottom
+            const overlapX = Math.min(this.x + this.r - obstacle.x, obstacle.x + obstacle.w - (this.x - this.r));
+            const overlapY = Math.min(this.y + this.r - obstacle.y, obstacle.y + obstacle.l - (this.y - this.r));
 
+            // Reverse the appropriate velocity based on the smaller overlap
+            if (overlapX < overlapY) {
+                this.vx = -this.vx;
+            } else {
+                this.vy = -this.vy;
+            }
+        }
+    }
 }
