@@ -38,7 +38,8 @@ class Ball {
                     if (side != SIDE.NONE) return side;
                 }
             }
-        }        
+        }     
+        return SIDE.NONE;   
     }
 
 

@@ -22,6 +22,7 @@ class Paddle {
     move(isCPU, ball) {
         if (isCPU) {
             // Add CPU logic here if needed
+            this.vy = paddleVelocity
         }
         this.y += this.vy;
         if (this.y < 0) this.y = 0;
