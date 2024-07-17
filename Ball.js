@@ -1,32 +1,46 @@
 class Ball {
-    constructor(x, y, vx, vy, r, c) {
+    constructor(x, y, vx, vy, r) {
         this.x = x;
         this.y = y;
         this.vx = vx;
         this.vy = vy;
         this.r = r;
-        this.c = c;
         this.inPlay = false;
+        this.image = new Image();
+        this.image.src = 'https://static.vecteezy.com/system/resources/previews/029/327/333/original/beach-ball-sport-balls-2d-color-illustrations-png.png'; // URL to your beach ball image
+        this.imageLoaded = false;
+        this.lastHitBy = null; // Track the last paddle that hit the ball
+        this.superSmash = null; // Track which side has the super smash effect
+        this.originalSpeed = { vx: vx, vy: vy }; // Store the original speed
+
+        // Set the imageLoaded flag to true when the image is fully loaded
+        this.image.onload = () => {
+            this.imageLoaded = true;
+        };
     }
 
     draw(ctx) {
-        ctx.fillStyle = this.c;
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 2;
-
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
-        ctx.stroke();
-        ctx.fill();
+        if (this.imageLoaded) {
+            ctx.drawImage(this.image, this.x - this.r, this.y - this.r, this.r * 2, this.r * 2);
+        } else {
+            // Draw a placeholder or fallback shape if the image is not yet loaded
+            ctx.fillStyle = "#FF6347"; // Vibrant red color as a placeholder
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+            ctx.fill();
+        }
     }
 
-    move() {
-        this.x += this.vx;
-        this.y += this.vy;
+    move(speedMultiplier) {
+        this.x += this.vx * speedMultiplier;
+        this.y += this.vy * speedMultiplier;
     }
 
     bounce(things) {
-        this.bounceWalls();
+        let scoreSide = this.bounceWalls();
+        if (scoreSide !== SIDE.NONE) {
+            return scoreSide;
+        }
         for (let thing of things) {
             if (thing instanceof Paddle) {
                 if (thing.side == SIDE.LEFT) {
@@ -52,6 +66,13 @@ class Ball {
         if (this.y + this.r > boardHeight) {
             this.vy = -Math.abs(this.vy);
         }
+        if (this.x - this.r < 0) {
+            return SIDE.LEFT;
+        }
+        if (this.x + this.r > boardWidth) {
+            return SIDE.RIGHT;
+        }
+        return SIDE.NONE;
     }
 
     bounceLeftPaddle(paddle) {
@@ -60,9 +81,17 @@ class Ball {
         if (this.y < paddle.y) return SIDE.NONE;
         if (this.y > paddle.y + paddle.l) return SIDE.NONE;
         if (this.vx < 0) {
+            if (this.superSmash === "LEFT") {
+                this.vx *= 3; // Triple the speed if super smash was collected by the left paddle
+                this.superSmash = null; // Reset the super smash effect
+            } else if (this.superSmash === "RIGHT") {
+                this.vx = this.originalSpeed.vx; // Reset speed if the opponent hits the ball
+                this.vy = this.originalSpeed.vy;
+            }
             this.vx = paddleForce * Math.abs(this.vx);
             let paddlePos = (this.y - paddle.y - paddle.l / 2) / paddle.l * 2;
             this.vy += paddlePos * 1.5;
+            this.lastHitBy = "LEFT"; // Track the last paddle that hit the ball
         }
         return SIDE.NONE;
     }
@@ -73,9 +102,17 @@ class Ball {
         if (this.y < paddle.y) return SIDE.NONE;
         if (this.y > paddle.y + paddle.l) return SIDE.NONE;
         if (this.vx > 0) {
+            if (this.superSmash === "RIGHT") {
+                this.vx *= 3; // Triple the speed if super smash was collected by the right paddle
+                this.superSmash = null; // Reset the super smash effect
+            } else if (this.superSmash === "LEFT") {
+                this.vx = this.originalSpeed.vx; // Reset speed if the opponent hits the ball
+                this.vy = this.originalSpeed.vy;
+            }
             this.vx = -paddleForce * Math.abs(this.vx);
             let paddlePos = (this.y - paddle.y - paddle.l / 2) / paddle.l * 2;
             this.vy += paddlePos * 1.5;
+            this.lastHitBy = "RIGHT"; // Track the last paddle that hit the ball
         }
         return SIDE.NONE;
     }

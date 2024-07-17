@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Pong Game</title>
     <link rel="stylesheet" href="pong.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:,"> <!-- This line prevents the browser from looking for a favicon -->
 </head>
 <body>
     <h1>MY PONG GAME</h1>
@@ -14,13 +16,24 @@
     <div id="scoreboard">0 : 0</div>
     <button id="reset" onclick="resetGame()">RESET</button>
     <br />
+    <input type="range" min="1" max="5" step="0.1" value="1" class="slider" id="speedSlider" style="width: 150px;">
+    <label for="speedSlider">Ball Speed</label>
+    <br />
     <input type="checkbox" id="cpucheck">
-    <label>CPU Play</label>
+    <label for="cpucheck">Right CPU Play</label>
+    <audio id="paddleSoundLeft" src="./point.wav"></audio>
+    <audio id="paddleSoundRight" src="./point.wav"></audio>
+    <input type="checkbox" id="cpucheckL">
+    <label for="cpucheckL">Left CPU Play</label>
+
+    <input type="checkbox" id="hardCheck">
+    <label for="hardCheck">HARD CPU</label>
 
     <script src="Ball.js"></script>
     <script src="Paddle.js"></script>
+    <script src="Obstacle.js"></script>
+    <script src="Powerup.js"></script>
     <script src="pong.js"></script>
     <script src="controls.js"></script>
-    <script src="Obstacle.js"></script>
 </body>
 </html>

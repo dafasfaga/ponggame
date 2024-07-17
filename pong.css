@@ -1,19 +1,26 @@
 body {
     text-align: center;
-    background-color: peachpuff;
+    background: url('https://png.pngtree.com/illustration/20220705/ourmid/pngtree-tropical-vacation-flat-color-vector-illustration-image_78826.png') no-repeat center center fixed;
+    background-size: cover;
+    color: dodgerblue;
+    font-family: 'Orbitron', sans-serif;
 }
 
 h1 {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Orbitron', sans-serif;
     font-size: 60px;
+    color: #FF6347;
 }
+
 h3 {
     font-size: 20px;
-    
+    color: #FFD700;
 }
+
 #scoreboard {
     font-size: 40px;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Orbitron', sans-serif;
+    color: dodgerblue;
 }
 
 #reset {
@@ -21,5 +28,24 @@ h3 {
     border-radius: 15px;
     width: 100px;
     height: 50px;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Orbitron', sans-serif;
+    background-color: #FF4500;
+    color: dodgerblue;
+    border: 2px solid #FFFFFF;
+}
+
+.slider {
+    width: 150px; 
+    margin-top: 10px;
+    background-color: #FF4500;
+}
+
+label {
+    display: block;
+    margin-top: 5px;
+    color: dodgerblue;
+}
+
+input[type="checkbox"] {
+    accent-color: #FF4500;
 }
