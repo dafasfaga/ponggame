@@ -4,30 +4,38 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Pong Game</title>
+    <title>BEACH Pong Game</title>
     <link rel="stylesheet" href="pong.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:,"> <!-- This line prevents the browser from looking for a favicon -->
 </head>
 <body>
-    <h1>MY PONG GAME</h1>
-    <h3>By Jordan and Lucas</h3>
-    <canvas id="gameboard" width="500" height="500"></canvas>
-    <div id="scoreboard">0 : 0</div>
-    <button id="reset" onclick="resetGame()">RESET</button>
-    <br />
-    <input type="range" min="1" max="5" step="0.1" value="1" class="slider" id="speedSlider" style="width: 150px;">
-    <label for="speedSlider">Ball Speed</label>
-    <br />
-    <input type="checkbox" id="cpucheck">
-    <label for="cpucheck">Right CPU Play</label>
-    <audio id="paddleSoundLeft" src="./point.wav"></audio>
-    <audio id="paddleSoundRight" src="./point.wav"></audio>
-    <input type="checkbox" id="cpucheckL">
-    <label for="cpucheckL">Left CPU Play</label>
+    <div id="key">
+        <h3>Power-ups</h3>
+        <p>Flip Flops <img src="https://www.pngall.com/wp-content/uploads/10/Flip-Flops-Vector-PNG-HD-Image.png" alt="Flip Flops" width="30"> = Shorten Opponent Paddle</p>
+        <p>Ice Cream Cone <img src="https://png.pngtree.com/png-vector/20220901/ourmid/pngtree-pink-ice-cream-cone-png-image_6134364.png" alt="Ice Cream Cone" width="30"> = Super Smash</p>
+        <p>Sunglasses <img src="https://purepng.com/public/uploads/large/purepng.com-sun-glassesglasseseyeglassesspectaclesplastic-lensesmountedsun-glasses-1421526498972uufgv.png" alt="Sunglasses" width="30"> = Increase Paddle Length</p>
+    </div>
+    <div id="game-container">
+        <h1>BEACH PONG GAME</h1>
+        <h3>By Jordan and Lucas</h3>
+        <canvas id="gameboard" width="500" height="500"></canvas>
+        <div id="scoreboard">0 : 0</div>
+        <button id="reset" onclick="resetGame()">RESET</button>
+        <br />
+        <input type="range" min="1" max="5" step="0.1" value="1" class="slider" id="speedSlider" style="width: 150px;">
+        <label for="speedSlider">Ball Speed</label>
+        <br />
+        <input type="checkbox" id="cpucheck">
+        <label>Right CPU Play</label>
 
-    <input type="checkbox" id="hardCheck">
-    <label for="hardCheck">HARD CPU</label>
+        <input type="checkbox" id="cpucheckL">
+        <label>Left CPU Play</label>
+
+        <input type="checkbox" id="hardCheck">
+        <label>HARD CPU</label>
+    </div>
+
+    <audio id="hitSound" src="hit_sound.wav" preload="auto"></audio>
+    <audio id="powerupSound" src="powerup_sound.mp3" preload="auto"></audio>
 
     <script src="Ball.js"></script>
     <script src="Paddle.js"></script>

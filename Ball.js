@@ -12,6 +12,7 @@ class Ball {
         this.lastHitBy = null; // Track the last paddle that hit the ball
         this.superSmash = null; // Track which side has the super smash effect
         this.originalSpeed = { vx: vx, vy: vy }; // Store the original speed
+        this.tripleSpeed = false; // Flag to track if the speed is tripled
 
         // Set the imageLoaded flag to true when the image is fully loaded
         this.image.onload = () => {
@@ -67,10 +68,10 @@ class Ball {
             this.vy = -Math.abs(this.vy);
         }
         if (this.x - this.r < 0) {
-            return SIDE.LEFT;
+            return SIDE.LEFT; // Right side scores when the ball hits the left side
         }
         if (this.x + this.r > boardWidth) {
-            return SIDE.RIGHT;
+            return SIDE.RIGHT; // Left side scores when the ball hits the right side
         }
         return SIDE.NONE;
     }
@@ -83,10 +84,12 @@ class Ball {
         if (this.vx < 0) {
             if (this.superSmash === "LEFT") {
                 this.vx *= 3; // Triple the speed if super smash was collected by the left paddle
+                this.tripleSpeed = true; // Set the triple speed flag
                 this.superSmash = null; // Reset the super smash effect
-            } else if (this.superSmash === "RIGHT") {
+            } else if (this.tripleSpeed && this.lastHitBy === "RIGHT") {
                 this.vx = this.originalSpeed.vx; // Reset speed if the opponent hits the ball
                 this.vy = this.originalSpeed.vy;
+                this.tripleSpeed = false; // Reset the triple speed flag
             }
             this.vx = paddleForce * Math.abs(this.vx);
             let paddlePos = (this.y - paddle.y - paddle.l / 2) / paddle.l * 2;
@@ -104,10 +107,12 @@ class Ball {
         if (this.vx > 0) {
             if (this.superSmash === "RIGHT") {
                 this.vx *= 3; // Triple the speed if super smash was collected by the right paddle
+                this.tripleSpeed = true; // Set the triple speed flag
                 this.superSmash = null; // Reset the super smash effect
-            } else if (this.superSmash === "LEFT") {
+            } else if (this.tripleSpeed && this.lastHitBy === "LEFT") {
                 this.vx = this.originalSpeed.vx; // Reset speed if the opponent hits the ball
                 this.vy = this.originalSpeed.vy;
+                this.tripleSpeed = false; // Reset the triple speed flag
             }
             this.vx = -paddleForce * Math.abs(this.vx);
             let paddlePos = (this.y - paddle.y - paddle.l / 2) / paddle.l * 2;

@@ -3,19 +3,25 @@ class Powerup {
         this.x = x;
         this.y = y;
         this.type = type;
-        this.width = 100;
-        this.height = 30;
+        this.width = 60; // Adjust size to fit the image
+        this.height = 60; // Adjust size to fit the image
         this.collected = false;
         this.collectedBy = null;
+        this.image = new Image();
+
+        // Set the image source based on the type of power-up
+        if (type === "Extend Paddle Length") {
+            this.image.src = 'https://purepng.com/public/uploads/large/purepng.com-sun-glassesglasseseyeglassesspectaclesplastic-lensesmountedsun-glasses-1421526498972uufgv.png';
+        } else if (type === "Super Smash") {
+            this.image.src = 'https://png.pngtree.com/png-vector/20220901/ourmid/pngtree-pink-ice-cream-cone-png-image_6134364.png';
+        } else if (type === "Shrink Opponent Paddle") {
+            this.image.src = 'https://www.pngall.com/wp-content/uploads/10/Flip-Flops-Vector-PNG-HD-Image.png';
+        }
     }
 
     draw(ctx) {
         if (!this.collected) {
-            ctx.fillStyle = "#FFD700"; // Gold color for powerup
-            ctx.fillRect(this.x, this.y, this.width, this.height);
-            ctx.fillStyle = "#000000"; // Black text color
-            ctx.font = "12px 'Orbitron', sans-serif";
-            ctx.fillText(this.type, this.x + 5, this.y + 20);
+            ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
         }
     }
 

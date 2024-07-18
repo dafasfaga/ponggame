@@ -3,7 +3,7 @@ const cpucheck = document.getElementById("cpucheck");
 const cpucheckL = document.getElementById("cpucheckL");
 
 const ctx = gameboard.getContext("2d");
-const STATE = {STARTUP: 0, PLAYING: 1, GAMEOVER: 2};
+const STATE = { STARTUP: 0, PLAYING: 1, GAMEOVER: 2 };
 let state = STATE.STARTUP;
 let boardWidth = gameboard.width;
 let boardHeight = gameboard.height;
@@ -17,7 +17,7 @@ let ball;
 let paddleL;
 let paddleR;
 let obstacles = []; // Array to hold all obstacles
-let powerUps = []; // Array to hold all powerups
+let powerUp = null; // Single power-up object
 let scoreL = 0;
 let scoreR = 0;
 let intervalID; // Declare intervalID here
@@ -25,6 +25,8 @@ let ballSpeed = 1; // Default ball speed
 
 const paddleSoundLeft = document.getElementById("paddleSoundLeft");
 const paddleSoundRight = document.getElementById("paddleSoundRight");
+const hitSound = document.getElementById("hitSound");
+const powerupSound = document.getElementById("powerupSound");
 
 let userInteracted = false;
 
@@ -51,8 +53,8 @@ function draw() {
     for (let obstacle of obstacles) {
         obstacle.draw(ctx);
     }
-    // Draw all powerups
-    for (let powerUp of powerUps) {
+    // Draw the single power-up
+    if (powerUp) {
         powerUp.draw(ctx);
     }
 }
@@ -64,19 +66,23 @@ function resetGame() {
     updateScore();
     state = STATE.STARTUP;
     resetBall();
+    resetPaddles();
+    obstacles = []; // Reset obstacles array
+    spawnObstacles();
+    spawnPowerup(); // Spawn the initial power-up
+    nextTick();
+}
+
+function resetPaddles() {
     paddleL = new Paddle(0, (boardHeight - paddleLength) / 2, paddleLength, paddleWidth, SIDE.LEFT, "#FF6347"); // Red color
     paddleR = new Paddle(boardWidth - paddleWidth, (boardHeight - paddleLength) / 2, paddleLength, paddleWidth, SIDE.RIGHT, "#FFC0CB"); // Pink color
-    obstacles = []; // Reset obstacles array
-    powerUps = []; // Reset powerups array
-    spawnObstacles();
-    spawnPowerups();
-    nextTick();
 }
 
 function resetBall() {
     ball = new Ball(boardWidth / 2, boardHeight / 2, 1, -1, ballRadius);
     ball.lastHitBy = null; // Reset the lastHitBy property
     ball.superSmash = null; // Reset the superSmash property
+    ball.tripleSpeed = false; // Reset the tripleSpeed flag
 }
 
 function spawnObstacles() {
@@ -95,12 +101,25 @@ function spawnObstacles() {
     obstacles.push(new Obstacle(x2, y2, l, w, imgSrc));
 }
 
-function spawnPowerups() {
+function spawnPowerup() {
     let types = ["Extend Paddle Length", "Super Smash", "Shrink Opponent Paddle"];
-    for (let type of types) {
-        let x = Math.random() * (boardWidth - 100);
-        let y = Math.random() * (boardHeight - 30);
-        powerUps.push(new Powerup(x, y, type));
+    let type = types[Math.floor(Math.random() * types.length)];
+    let x = Math.random() * (boardWidth - 120); // Adjusted for the new power-up width
+    let y = Math.random() * (boardHeight - 50); // Adjusted for the new power-up height
+    powerUp = new Powerup(x, y, type); // Spawn a new power-up
+}
+
+function playHitSound() {
+    if (hitSound) {
+        hitSound.currentTime = 0;
+        hitSound.play();
+    }
+}
+
+function playPowerupSound() {
+    if (powerupSound) {
+        powerupSound.currentTime = 0;
+        powerupSound.play();
     }
 }
 
@@ -133,32 +152,35 @@ function nextTick() {
 function play() {
     paddleL.move(cpucheckL.checked, ball);
     paddleR.move(cpucheck.checked, ball);
-    let scoreSide = ball.bounce([paddleL, paddleR, ...obstacles, ...powerUps]); // Include all obstacles and powerups in the bounce method
+    let scoreSide = ball.bounce([paddleL, paddleR, ...obstacles, powerUp]); // Include the single power-up in the bounce method
     if (scoreSide != SIDE.NONE) {
-        if (scoreSide == SIDE.LEFT) { 
-            scoreL++;
-            if (userInteracted) {
+        if (scoreSide == SIDE.RIGHT) { 
+            scoreL++; // Right side hitting the left wall gives a point to the left side
+            playHitSound(); // Play sound when ball hits the paddle
+            if (userInteracted && paddleSoundLeft) {
                 paddleSoundLeft.currentTime = 0;
                 paddleSoundLeft.play(); 
             }
         }
-        if (scoreSide == SIDE.RIGHT) {
-            scoreR++;
-            if (userInteracted) {
-                paddleSoundRight.currentTime = 0;  
+        if (scoreSide == SIDE.LEFT) {
+            scoreR++; // Left side hitting the right wall gives a point to the right side
+            playHitSound(); // Play sound when ball hits the paddle
+            if (userInteracted && paddleSoundRight) {
+                paddleSoundRight.currentTime = 0;
                 paddleSoundRight.play(); 
             }
         }
         updateScore();
         resetBall();
+        resetPaddles(); // Reset paddle lengths after each point
+        spawnPowerup(); // Spawn a new power-up when a point is scored
         if (scoreL > 10 || scoreR > 10) return STATE.GAMEOVER;
     }
 
     // Check for powerup collision and apply effect
-    for (let powerUp of powerUps) {
-        if (powerUp.checkCollision(ball)) {
-            powerUp.applyEffect(paddleL, paddleR, ball);
-        }
+    if (powerUp && powerUp.checkCollision(ball)) {
+        playPowerupSound(); // Play sound when a power-up is collected
+        powerUp.applyEffect(paddleL, paddleR, ball);
     }
 
     ball.move(ballSpeed);
